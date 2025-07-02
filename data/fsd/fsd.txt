@@ -1,0 +1,141 @@
+FSD: Blogging Platform REST API
+1. Overview
+Purpose: Provide a backend for a blogging platform allowing users to register, write posts, comment, and moderate content.
+Actors:
+
+Public Visitor
+
+Registered User
+
+Admin
+
+2. Modules & Endpoints
+2.1 Authentication
+POST /auth/register
+
+Input: { username: string, email: string, password: string }
+
+Output: { userId: uuid, token: string }
+
+Errors: 400 on invalid email/password, 409 if email exists
+
+POST /auth/login
+
+Input: { email: string, password: string }
+
+Output: { token: string }
+
+Errors: 401 on invalid credentials
+
+2.2 Users
+GET /users/{id} – returns { id, username, email, bio }
+
+PUT /users/{id} – update profile, requires JWT, only by same user
+
+DELETE /users/{id} – requires Admin
+
+2.3 Posts
+POST /posts/ – create a post (title, body, optional tags), authenticated
+
+GET /posts/ – list all posts with id, title, summary, authorId, tags, createdAt
+
+GET /posts/{id} – full post detail plus comments
+
+PUT /posts/{id} – edit post (author only)
+
+DELETE /posts/{id} – author or admin
+
+2.4 Comments
+POST /posts/{id}/comments – add comment (body), authenticated
+
+GET /posts/{id}/comments – list comments with author & timestamps
+
+DELETE /comments/{id} – comment owner or admin
+
+2.5 Tags
+GET /tags/ – list all tags with usage counts
+
+GET /tags/{tag}/posts – list posts using a specific tag
+
+3. Data Models (Pydantic-style)
+yaml
+Copy
+Edit
+User:
+  id: uuid
+  username: str (min 3, max 20)
+  email: str (valid email)
+  password_hash: str
+  bio: Optional[str]
+  created_at: datetime
+
+Post:
+  id: uuid
+  title: str (max 200)
+  body: str
+  author_id: uuid
+  tags: List[str]
+  created_at: datetime
+  updated_at: datetime
+
+Comment:
+  id: uuid
+  post_id: uuid
+  author_id: uuid
+  body: str (max 1000)
+  created_at: datetime
+4. Functional Requirements
+Users can register, login, and manage own profiles.
+
+Logged-in users can create, read, update, and delete their own posts.
+
+Anyone can list and read posts; only logged-in users can comment.
+
+Each post page displays all comments.
+
+Tagging system supports filtering posts by tag.
+
+Admins can delete any post or comment, or ban users.
+
+5. Validation Rules
+Username: 3–20 alphanumeric characters
+
+Password: minimum 8 characters, at least one number and one letter
+
+Email: valid format and unique
+
+Title: non-empty, max 200 characters
+
+Comment body: non-empty, max 1000 characters
+
+6. Authentication & Authorization
+Use JWT in Authorization: Bearer <token> header
+
+Roles:
+
+User: can manage own data
+
+Admin: full privileges
+
+7. Error Handling
+Standard HTTP status codes (400, 401, 403, 404, 409, 500)
+
+JSON error format:
+
+json
+Copy
+Edit
+{
+  "error": "ValidationError",
+  "message": "Title cannot be empty",
+  "details": { "title": "required" }
+}
+8. Non-Functional Requirements
+Performance: 95% of requests < 200 ms under 1000 concurrent users
+
+Availability: ≥ 99.9% uptime
+
+Security: HTTPS required; password hashing (bcrypt)
+
+Logging: Log every request with timestamp, user ID, endpoint, and status
+

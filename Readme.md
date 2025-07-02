@@ -1,45 +1,61 @@
 # API Genius — Agentic AI for REST API Generation from Functional Specs
 
-## Overview
+## 🚀 Overview
 
-**API Genius** is an agentic AI application designed to automatically generate REST APIs from functional requirement documents (FSDs).  
-It uses a multi-agent architecture leveraging:
+**API Genius** is a modular, multi-agent AI application that automatically generates **REST APIs** from **functional specification documents (FSDs)**.
 
-- **LlamaIndex** for local document ingestion, chunking, and vector indexing
-- **MistralAI (via Ollama)** as a local large language model (LLM) for natural language understanding and generation
-- **FastAPI** for serving the generated API code (future extension)
+Built for developers who want to convert business requirements into production-ready backend code, API Genius uses **local LLMs**, **document indexing**, and **agentic workflows** to orchestrate the full process — **securely and offline**.
 
-This project demonstrates how to build fully **local, private, and GPU-accelerated AI workflows** for software automation.
+### 🎯 Key Highlights
 
----
-
-## Key Components
-
-| Component          | Purpose                                               |
-|--------------------|-------------------------------------------------------|
-| `LlamaIndex`       | Document parsing, chunking, local embedding & retrieval |
-| `MistralAI` via `Ollama` | Local open-weight LLM for prompt completion and generation |
-| `FastAPI`          | Web framework to serve generated APIs (planned)         |
-| Multi-agent system | Agents for parsing requirements, designing schemas, generating code |
+- Local-first, GPU-accelerated, and fully private (no cloud APIs)
+- Step-by-step multi-agent orchestration using [LlamaIndex FunctionAgent + AgentWorkflow](https://docs.llamaindex.ai/en/stable/examples/agents/function_agents/)
+- Designed for future extensibility: schema generation, OpenAPI docs, test case creation, and more
 
 ---
 
-## Hardware & Environment Requirements
+## 🧠 Agent Architecture
 
-- This project runs **fully locally** — no cloud API calls or external services needed after setup.
-- You **need a GPU with at least 8GB of VRAM or more** to efficiently run the MistralAI model via Ollama.
-- The tested example GPU is an **RTX 5060 with 8GB VRAM**, but any GPU with similar VRAM (from NVIDIA or other vendors) should work.
-- Running on CPU only is possible but will be significantly slower.
-- Ensure your GPU drivers and CUDA/OpenCL libraries are properly installed for optimal performance.
+| Agent Name                | Purpose                                                                 |
+|---------------------------|-------------------------------------------------------------------------|
+| `RequirementsParserAgent` | Parses FSDs and extracts requirements via RAG and tool calling only     |
+| `SchemaGeneratorAgent`    | Creates database or Pydantic models from parsed requirements *(planned)*|
+| `CodeGeneratorAgent`      | Generates FastAPI-compatible route logic *(planned)*                   |
+| `OpenAPIGeneratorAgent`   | Creates OpenAPI v3 specifications *(planned)*                           |
+| `TestCaseGeneratorAgent`  | Builds test cases based on validations & constraints *(planned)*        |
+
+Each agent is built using **FunctionAgent** with dedicated tools, context memory, and clear reasoning prompts.
 
 ---
 
-## Installation
+## 🧱 Tech Stack
 
-### 1. Clone this repository
+| Tool / Library         | Role                                                        |
+|------------------------|-------------------------------------------------------------|
+| **LlamaIndex**         | Indexing, RAG, memory, FunctionAgent orchestration          |
+| **Mistral (via Ollama)** | Local LLM for tool-using agents                             |
+| **FastAPI**            | Framework to serve generated backend (target output)        |
+| **Python**             | Core language for orchestration                             |
 
-    git clone https://github.com/yourusername/apigenius.git
-    cd apigenius
+---
+
+## 🖥️ System Requirements
+
+- ✅ **Fully local setup** — no internet or OpenAI keys required
+- ⚙️ Python 3.10+
+- 🧠 GPU with **8GB VRAM or higher** recommended (e.g., RTX 4060/5060)
+- 🐌 CPU-only fallback possible but slower
+- 📦 Ensure latest NVIDIA drivers + CUDA installed (if using GPU)
+
+---
+
+## 🛠️ Installation
+
+### 1. Clone the repository
+
+```bash
+git clone https://github.com/yourusername/apigenius.git
+cd apigenius
 
 ### 2. Set up Python environment
 
@@ -126,7 +142,7 @@ Verify it runs:
 
 ## License
 
-MIT License © 2025 Your Name
+MIT License © 2025
 
 ---
 
