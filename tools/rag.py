@@ -45,3 +45,12 @@ async def write_requirements_to_context_store(ctx: Context, fsd : str) -> str :
     #print(fsd)
     return "Parsed requirements stored in context memory store"
 
+async def get_parsed_requirements(ctx: Context) -> str:
+    """This function is helpul in getting parsed requirements from context store"""
+    parsed_requirements = await ctx.store.get("requirements")
+    return parsed_requirements
+async def generate_schema_from_parsed_requirements(parasedRequirements: str, ctx: Context) -> str:
+    """This function is useful in generating database schema, entity relationships from parased requirements and storing it in memory context"""
+    response = await Settings.llm.acomplete(f"generate database schema, entity relationships from functional requirements. This schema will be used in generating fastapi application later :" + parasedRequirements)
+    ctx.store.set("schema",str(response))
+    return str(response)

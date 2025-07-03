@@ -2,39 +2,36 @@ from llama_index.core.agent.workflow import FunctionAgent
 from llama_index.llms.ollama import Ollama
 from tools.rag import query_rag,get_query_index,write_requirements_to_context_store
 from llama_index.core.tools import FunctionTool
+from agents.database_schema_generator_agent import schemageneratoragent
 class Requirement_parser:
     system_prompt = """
-You are the RequirementsParser agent.
+You are an agent named 'RequirementsParser'. Your only role is to extract requirement-related information from a Functional Specification Document (FSD) by calling the provided tools — one at a time.
 
-Your ONLY responsibility is to call tools to extract requirement information from the FSD (Functional Specification Document).
+⚠️ Do NOT write answers, summaries, or code. Only use the tools.
 
-⚠️ You are NOT allowed to write code or produce answers yourself.
-✅ You MUST only call the tools provided to you.
+Follow this exact sequence:
 
-Use this step-by-step process:
+1. Call the tool: get_query_index — to initialize the document index.
+2. Then, for each of these questions, call query_rag with the question as input:
+   - What are the system-level requirements?
+   - What are the functional requirements?
+   - What entities are described in the system?
+   - What are the data models?
+   - What are the roles and permissions?
+   - What REST endpoints are proposed?
+   - What validations and constraints exist?
+   - What non-functional requirements are specified?
 
-1. First, call `get_query_index` to initialize indexing.
-2. Then for **each** of the following queries, call `query_rag` **with that query string as input** (do not call `query_rag` without a query):
-   - "What are the system-level requirements?"
-   - "What are the functional requirements?"
-   - "What entities are described in the system?"
-   - "What are the data models?"
-   - "What are the roles and permissions?"
-   - "What REST endpoints are proposed?"
-   - "What validations and constraints exist?"
-   - "What non-functional requirements are specified?"
+3. After collecting all answers, combine them into one formatted string with clear section headers.
 
-3. After collecting results, concatenate them with clear section headers.
+4. Finally, call the tool: write_requirements_to_context_store with the combined result.
 
-4. Call `write_requirements_to_context_store` with the full compiled string.
-
-Your output must be in the form of tool calls only.
-
-🔁 Call one tool at a time. Do not skip steps.
+🚫 Do not output anything except tool calls.
+🛠️ Only one tool call at a time. No skipping, no batching.
 """
 
 
-    llm = Ollama(model="mistral",request_timeout=120.0)
+    llm = Ollama(model="mistral", request_timeout=120,)
     requirementParse_agent = FunctionAgent(
         name="requirementParse_agent",
         description="This agent will be starter point of whole project. The agent will be useful to parse functional requirement document and perform indexing to query later",\
@@ -43,8 +40,12 @@ Your output must be in the form of tool calls only.
         tools=[
             FunctionTool.from_defaults(fn=get_query_index),
             FunctionTool.from_defaults(fn=query_rag),
-            FunctionTool.from_defaults(fn=write_requirements_to_context_store),
+            FunctionTool.from_defaults(name="write_requirements_to_context_store",
+                                        description="Save the compiled requirement sections for further use",
+                                        fn=write_requirements_to_context_store,),
         ],
-        function_call_mode="sequential"
+        function_call_mode="sequential",
+        can_handoff_to=["database_schema_generator_agent"]
+        
     )
 

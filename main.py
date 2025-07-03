@@ -1,5 +1,6 @@
 from llama_index.core.agent.workflow import AgentWorkflow
 from agents.requirements_parser import Requirement_parser
+from agents.database_schema_generator_agent import schemageneratoragent
 from llama_index.core.agent.workflow import (
     AgentInput,
     AgentOutput,
@@ -11,18 +12,21 @@ from llama_index.core.agent.workflow import (
 
 async def main():
     agent_workflow = AgentWorkflow(
-        agents=[Requirement_parser.requirementParse_agent],
-        root_agent= Requirement_parser.requirementParse_agent.name,
+        agents=[Requirement_parser.requirementParse_agent, schemageneratoragent.database_schema_generator_agent],
+        root_agent= "requirementParse_agent",
         initial_state={
-            "requirements":[]
+            "requirements":[],
+            "schema":[]
         }
     )
 
     handler = agent_workflow.run(
-    user_msg=(
-        "Start parsing the FSD and extract all requirements using tools of agents only"
+    user_msg = (
+    "Start parsing the FSD and extract all requirements using tools of agents only"
     )
+
     )
+
 
     current_agent = None
     current_tool_calls = ""
@@ -56,6 +60,9 @@ async def main():
         elif isinstance(event, ToolCall):
             print(f"🔨 Calling Tool: {event.tool_name}")
             print(f"  With arguments: {event.tool_kwargs}")
+
+
+
             
 if __name__ == "__main__":
     import asyncio
