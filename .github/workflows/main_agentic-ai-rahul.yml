@@ -24,7 +24,7 @@ jobs:
           pip install -r requirements.txt
 
       - name: Deploy to Azure Web App
-        uses: azure/webapps-deploy@v5
+        uses: azure/webapps-deploy@v2
         with:
           app-name: 'Agentic-AI-rahul'
           slot-name: 'Production'
