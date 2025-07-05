@@ -4,146 +4,171 @@
 
 **API Genius** is a modular, multi-agent AI application that automatically generates **REST APIs** from **functional specification documents (FSDs)**.
 
-Built for developers who want to convert business requirements into production-ready backend code, API Genius uses **local LLMs**, **document indexing**, and **agentic workflows** to orchestrate the full process — **securely and offline**.
+Designed for backend developers, API Genius reads your requirements, extracts business logic, generates database schemas, and plans backend APIs — all using intelligent AI agents powered by **LlamaIndex**, **Streamlit**, and **Groq LLMs**.
 
-### 🎯 Key Highlights
+## 🎯 Key Highlights
 
-- Local-first, GPU-accelerated, and fully private (no cloud APIs)
-- Step-by-step multi-agent orchestration using [LlamaIndex FunctionAgent + AgentWorkflow](https://docs.llamaindex.ai/en/stable/examples/agents/function_agents/)
-- Designed for future extensibility: schema generation, OpenAPI docs, test case creation, and more
-
----
+* Streamlit-powered **interactive UI** for ease of use
+* Uses **Groq-hosted LLaMA 3.1 models** (free with limits) for reliable responses
+* Step-by-step **agent-based orchestration** using [LlamaIndex FunctionAgent + AgentWorkflow](https://docs.llamaindex.ai/en/stable/examples/agents/function_agents/)
+* Modular and extensible pipeline for parsing specs, generating schema, APIs, OpenAPI docs, tests, and more
+* Optional support for **local LLMs via Ollama**
 
 ## 🧠 Agent Architecture
 
-| Agent Name                | Purpose                                                                 |
-|---------------------------|-------------------------------------------------------------------------|
-| `RequirementsParserAgent` | Parses FSDs and extracts requirements via RAG and tool calling only     |
-| `SchemaGeneratorAgent`    | Creates database or Pydantic models from parsed requirements *(planned)*|
-| `CodeGeneratorAgent`      | Generates FastAPI-compatible route logic *(planned)*                   |
-| `OpenAPIGeneratorAgent`   | Creates OpenAPI v3 specifications *(planned)*                           |
-| `TestCaseGeneratorAgent`  | Builds test cases based on validations & constraints *(planned)*        |
+| Agent Name                | Purpose                                                             |
+| ------------------------- | ------------------------------------------------------------------- |
+| `RequirementsParserAgent` | Parses FSDs and extracts requirements via RAG and tool calling only |
+| `SchemaGeneratorAgent`    | Creates database schemas or Pydantic models                         |
+| `CodeGeneratorAgent`      | *(Planned)* Generate FastAPI route logic                            |
+| `OpenAPIGeneratorAgent`   | *(Planned)* Create OpenAPI v3 specs                                 |
+| `TestCaseGeneratorAgent`  | *(Planned)* Build test cases based on constraints                   |
 
-Each agent is built using **FunctionAgent** with dedicated tools, context memory, and clear reasoning prompts.
+All agents are built using **FunctionAgent** and **tool calling**, with memory between stages.
 
----
+## 📊 Tech Stack
 
-## 🧱 Tech Stack
+| Tool / Library          | Role                                                              |
+| ----------------------- | ----------------------------------------------------------------- |
+| **LlamaIndex**          | RAG, FunctionAgent, indexing, context memory                      |
+| **Groq LLaMA 3.1 API**  | Fast and accurate hosted LLM (free with usage caps)               |
+| **Streamlit**           | Frontend to interactively run and view agent execution            |
+| **Python**              | Core language                                                     |
+| **Ollama (optional)**   | Local LLM runtime (Mistral or Code LLaMA) — fallback if preferred |
+| **FastAPI** *(planned)* | Target backend framework to generate APIs                         |
 
-| Tool / Library         | Role                                                        |
-|------------------------|-------------------------------------------------------------|
-| **LlamaIndex**         | Indexing, RAG, memory, FunctionAgent orchestration          |
-| **Mistral (via Ollama)** | Local LLM for tool-using agents                             |
-| **FastAPI**            | Framework to serve generated backend (target output)        |
-| **Python**             | Core language for orchestration                             |
+## 💻 System Requirements
 
----
-
-## 🖥️ System Requirements
-
-- ✅ **Fully local setup** — no internet or OpenAI keys required
-- ⚙️ Python 3.10+
-- 🧠 GPU with **8GB VRAM or higher** recommended (e.g., RTX 4060/5060)
-- 🐌 CPU-only fallback possible but slower
-- 📦 Ensure latest NVIDIA drivers + CUDA installed (if using GPU)
-
----
+* ✅ Works with **Groq** hosted LLMs — no GPU required
+* ⚙️ Python 3.10+
+* 💼 Optional: 8GB+ GPU if running Ollama locally
+* 📱 Internet access needed for Groq model usage
 
 ## 🛠️ Installation
 
-### 1. Clone the repository
+### 1. Clone the repo
 
 ```bash
 git clone https://github.com/yourusername/apigenius.git
 cd apigenius
+```
 
 ### 2. Set up Python environment
 
-    python -m venv venv
-    source venv/bin/activate  # Linux/macOS
-    venv\Scripts\activate     # Windows
+```bash
+python -m venv .venv
+source .venv/bin/activate        # macOS/Linux
+.venv\Scripts\activate           # Windows
 
-    pip install --upgrade pip
-    pip install -r requirements.txt
+pip install --upgrade pip
+pip install -r requirements.txt
+```
 
-### 3. Install Ollama and MistralAI model
+### 3. Configure your secrets
 
-Ollama is the local LLM manager and runtime for MistralAI:
+Create a `.env` file in the root:
 
-#### Install Ollama
+```env
+GROQ_API_KEY=your_groq_api_key_here
+```
 
-- **macOS / Linux**
+> You can get your key from [https://console.groq.com](https://console.groq.com)
 
-    curl -fsSL https://ollama.com/install.sh | sh
+## ⏺️ Running the App
 
-- **Windows**
+### ▶️ Option 1: Using Streamlit UI
 
-Download installer from https://ollama.com/download
+```bash
+streamlit run app.py
+```
 
-#### Pull Mistral Model
+* Upload or edit your FSD document
+* Click "Run Agents"
+* View live streaming output from each agent
+* Final schema and requirements will be saved in `./data/req.txt`
 
-    ollama pull mistral
+### ▶️ Option 2: CLI Execution
 
-Verify it runs:
+```bash
+python main.py
+```
 
-    ollama run mistral
+The agents will stream step-by-step reasoning and tool usage to the console. Output is saved in `./data/req.txt`.
 
----
+## 📁 Project Structure
 
-## Usage
+```
+apigenius/
+├── agents/                # Agent definitions
+├── config/                # Pydantic settings + secrets
+├── data/                  # Input/output files
+├── prompts/               # Prompt templates for agents
+├── app.py                 # Streamlit frontend
+├── main.py                # CLI entrypoint
+├── requirements.txt       # Python dependencies
+└── README.md              # This file
+```
 
-1. Prepare your functional requirement document (`.md` file) in `data/sample_requirements/`.
+## ☁️ Azure Web App Deployment (Optional)
 
-2. Run the main script to parse requirements and extract API endpoints plus business logic:
+To deploy on Azure:
 
-    python main.py
+1. Set up an Azure Web App for Python
+2. Add your `GROQ_API_KEY` as an application setting in Azure Portal
+3. Set startup command:
 
-3. The output will be a JSON structure listing endpoints with detailed business logic extracted from your FSD.
+```bash
+streamlit run app.py --server.port 8000
+```
 
----
+4. Push code via GitHub Actions or VSCode
 
-## Project Structure
+## 🔐 Environment & Secrets
 
-    apigenius/
-    ├── agents/               # Agent classes (BaseAgent, RequirementsParserAgent, etc.)
-    ├── config/               # Configuration files
-    ├── data/                 # Sample requirements and generated outputs
-    ├── prompts/              # Prompt templates for agents
-    ├── main.py               # Entry point to run agents
-    ├── requirements.txt      # Python dependencies
-    └── README.md             # This file
+Manage secrets using **Pydantic Settings** via `.env`:
 
----
+```python
+# config/secrets.py
+from pydantic_settings import BaseSettings
 
-## Notes
+class Settings(BaseSettings):
+    groq_api_key: str
 
-- This project is **GPU-accelerated**. Running Ollama and Mistral on CPU only is possible but will be significantly slower.
-- Ensure your GPU drivers and CUDA toolkit/OpenCL are properly installed and compatible with your setup.
-- For best performance, have a GPU with **at least 8GB VRAM**.
+    class Config:
+        env_file = ".env"
+```
 
----
+Use in agents:
 
-## Future Enhancements
+```python
+from config.secrets import Settings
+settings = Settings()
+```
 
-- Extend the multi-agent pipeline to generate full FastAPI route implementations from extracted business logic.
-- Add automated testing generation based on parsed business rules.
-- Implement a web interface for uploading FSDs and managing generated APIs.
+## ⚡ Notes
 
----
+* Groq LLaMA 3.1 models are **significantly faster** and more accurate than local Mistral in most cases
+* Local models (Ollama) are still supported for offline fallback
+* GPU recommended for local models: RTX 4060 or higher
 
-## References & Resources
+## 🔮 Future Enhancements
 
-- [LlamaIndex Documentation](https://gpt-index.readthedocs.io/)
-- [Ollama](https://ollama.com/)
-- [MistralAI](https://www.mistral.ai/)
-- [FastAPI](https://fastapi.tiangolo.com/)
+* ✅ Streamlit frontend (added)
+* 🧠 Code generation agent (planned)
+* 📄 OpenAPI doc generation
+* 🧪 Automated test case generation
+* ☁️ Optional database scaffolding and FastAPI project export
 
----
+## 📚 References
 
-## License
+* [Groq](https://console.groq.com)
+* [LlamaIndex](https://docs.llamaindex.ai/)
+* [Streamlit](https://streamlit.io/)
+* [FastAPI](https://fastapi.tiangolo.com/)
+* [Ollama](https://ollama.com/)
+
+## 🗪 License
 
 MIT License © 2025
 
----
-
-Feel free to open issues or contribute!
+Feel free to ⭐ the repo and contribute!

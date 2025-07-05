@@ -5,14 +5,17 @@ from llama_index.embeddings.huggingface import HuggingFaceEmbedding
 from functools import lru_cache
 from llama_index.core.query_engine import BaseQueryEngine
 import json, time, os
+from llama_index.llms.groq import Groq
+from config.settings import settings
 
 PERSIST_DIR = "./index/"
 DATA_DIR = "./data/fsd/"
 Settings.embed_model = HuggingFaceEmbedding(model_name="BAAI/bge-base-en-v1.5")
-Settings.llm = Ollama(
-    model="mistral",
-    request_timeout=120.0
-)
+#Settings.llm = Ollama(
+    #model="mistral",
+    #request_timeout=120.0
+#)
+Settings.llm = Groq(model=settings.grok_model_name,api_key=settings.groq_api_key,parallel_tool_calls=True)
 def _get_query_engine() -> BaseQueryEngine:
     """Internal method to return query engine object (not exposed to agent)."""
     if os.path.exists(PERSIST_DIR) and os.listdir(PERSIST_DIR):

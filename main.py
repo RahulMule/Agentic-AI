@@ -1,67 +1,39 @@
-from llama_index.core.agent.workflow import AgentWorkflow
+# Keep all your imports...
+from llama_index.core.agent.workflow import AgentWorkflow, AgentInput, AgentOutput, ToolCall, ToolCallResult, AgentStream
 from agents.requirements_parser import Requirement_parser
 from agents.database_schema_generator_agent import schemageneratoragent
-from llama_index.core.agent.workflow import (
-    AgentInput,
-    AgentOutput,
-    ToolCall,
-    ToolCallResult,
-    AgentStream,
-)
 
-
-async def main():
+async def run_agent_workflow():
+    output_buffer = []
     agent_workflow = AgentWorkflow(
         agents=[Requirement_parser.requirementParse_agent, schemageneratoragent.database_schema_generator_agent],
-        root_agent= "requirementParse_agent",
-        initial_state={
-            "requirements":[],
-            "schema":[]
-        }
+        root_agent="requirementParse_agent",
+        initial_state={"requirements": [], "schema": []},
     )
 
-    handler =  agent_workflow.run(
-    user_msg = ("Start parsing the FSD and extract all requirements using tools of agents only, once done handoff to database_schema_generator_agent to generate database schema")
-
+    handler = agent_workflow.run(
+        user_msg="Start parsing the FSD and extract all requirements using tools of agents only, once done handoff to database_schema_generator_agent to generate database schema"
     )
-
 
     current_agent = None
-    current_tool_calls = ""
     async for event in handler.stream_events():
-        if (
-            hasattr(event, "current_agent_name")
-            and event.current_agent_name != current_agent
-        ):
+        if hasattr(event, "current_agent_name") and event.current_agent_name != current_agent:
             current_agent = event.current_agent_name
-            print(f"\n{'='*50}")
-            print(f"🤖 Agent: {current_agent}")
-            print(f"{'='*50}\n")
+            output_buffer.append(f"\n\n🤖 Agent: {current_agent}\n{'='*50}")
 
-        if isinstance(event, AgentStream):
-            if event.delta:
-                print(event.delta, end="", flush=True)
+        if isinstance(event, AgentStream) and event.delta:
+            output_buffer.append(event.delta)
         elif isinstance(event, AgentInput):
-             print("📥 Input:", event.input)
+            output_buffer.append(f"\n📥 Input: {event.input}")
         elif isinstance(event, AgentOutput):
             if event.response.content:
-                print("📤 Output:", event.response.content)
+                output_buffer.append(f"\n📤 Output: {event.response.content}")
             if event.tool_calls:
-                print(
-                    "🛠️  Planning to use tools:",
-                    [call.tool_name for call in event.tool_calls],
-                )
-        elif isinstance(event, ToolCallResult):
-            print(f"🔧 Tool Result ({event.tool_name}):")
-            print(f"  Arguments: {event.tool_kwargs}")
-            print(f"  Output: {event.tool_output}")
+                tools = ', '.join([call.tool_name for call in event.tool_calls])
+                output_buffer.append(f"\n🛠️ Tools to be used: {tools}")
         elif isinstance(event, ToolCall):
-            print(f"🔨 Calling Tool: {event.tool_name}")
-            print(f"  With arguments: {event.tool_kwargs}")
+            output_buffer.append(f"\n🔨 Calling Tool: {event.tool_name} with {event.tool_kwargs}")
+        elif isinstance(event, ToolCallResult):
+            output_buffer.append(f"\n🔧 Tool Result ({event.tool_name}):\n{event.tool_output}")
 
-
-
-            
-if __name__ == "__main__":
-    import asyncio
-    asyncio.run(main())
+    return "\n".join(output_buffer)
