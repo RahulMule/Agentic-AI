@@ -1,2 +1,52 @@
+# Byte-compiled / optimized / compiled files
+__pycache__/
+*.pyc
+*.pyd
+*.pyo
+*.egg
+
+# Distribution / packaging
+.Python
+build/
+dist/
+develop-eggs/
+eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+htmlcov/
+.tox/
+.coverage
+.cache
+.pytest_cache/
+
+# Virtual environment
+venv/
+.venv/
+env/
+.env/
+
+# Editor-specific files
+.vscode/
+.idea/
+*.swp
+*~
+.DS_Store # macOS specific
+
+# Miscellaneous
+.env # Environment variables
+*.log
+*.sqlite3 # SQLite databases
+media/ # User uploaded media files in Django/Flask
+static/ # Collectstatic files in Django
 .env
-sample.md
+agents/__pycache__/database_schema_generator_agent.cpython-313.pyc
+agents/__pycache__/requirements_parser.cpython-313.pyc
+agents/__pycache__/database_schema_generator_agent.cpython-313.pyc
+tools/__pycache__/rag.cpython-313.pyc

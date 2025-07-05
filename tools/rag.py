@@ -4,7 +4,7 @@ from llama_index.llms.ollama import Ollama
 from llama_index.embeddings.huggingface import HuggingFaceEmbedding
 from functools import lru_cache
 from llama_index.core.query_engine import BaseQueryEngine
-import os
+import json, time, os
 
 PERSIST_DIR = "./index/"
 DATA_DIR = "./data/fsd/"
@@ -42,8 +42,8 @@ def query_rag(query:str) -> str:
 async def write_requirements_to_context_store(ctx: Context, fsd : str) -> str :
     """This function is useful when all the functional requirements are gathered and needs to be written in cotext store"""
     await ctx.store.set("requirements",fsd)
-    #print(fsd)
-    return "Parsed requirements stored in context memory store"
+    print(fsd)
+    return json.dumps({"status": "done", "next_agent": "database_schema_generator_agent"})
 
 async def get_parsed_requirements(ctx: Context) -> str:
     """This function is helpul in getting parsed requirements from context store"""
@@ -54,3 +54,20 @@ async def generate_schema_from_parsed_requirements(parasedRequirements: str, ctx
     response = await Settings.llm.acomplete(f"generate database schema, entity relationships from functional requirements. This schema will be used in generating fastapi application later :" + parasedRequirements)
     ctx.store.set("schema",str(response))
     return str(response)
+
+def write_to_txt_file(file_path: str, content: str) -> str:
+    """this method is useful in writing the agent output into local path
+
+    Args:
+        file_path (str): _description_
+        content (str): _description_
+
+    Returns:
+        str: _description_
+    """
+    try:
+        with open(file_path, 'w', encoding='utf-8') as file:
+            file.write(content)
+        return str( json.dumps({"status": "done", "next_agent": "database_schema_generator_agent"}))
+    except Exception as e:
+        return f"Failed: {str(e)}"

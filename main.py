@@ -20,10 +20,8 @@ async def main():
         }
     )
 
-    handler = agent_workflow.run(
-    user_msg = (
-    "Start parsing the FSD and extract all requirements using tools of agents only"
-    )
+    handler =  agent_workflow.run(
+    user_msg = ("Start parsing the FSD and extract all requirements using tools of agents only, once done handoff to database_schema_generator_agent to generate database schema")
 
     )
 
