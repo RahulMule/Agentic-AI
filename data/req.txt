@@ -1,8 +1,15 @@
-System-Level Requirements:
-Functional Requirements:
-Entities:
-Data Models:
-Roles and Permissions:
-REST Endpoints:
-Validations and Constraints:
-Non-Functional Requirements:
+System-level requirements:
+
+Functional requirements:
+
+Entities described in the system:
+
+Data models:
+
+Roles and permissions:
+
+REST endpoints proposed:
+
+Validations and constraints:
+
+Non-functional requirements specified:

@@ -1,0 +1,44 @@
+# Keep all your imports...
+from llama_index.core.agent.workflow import AgentWorkflow, AgentInput, AgentOutput, ToolCall, ToolCallResult, AgentStream
+from agents.requirements_parser import Requirement_parser
+from agents.database_schema_generator_agent import schemageneratoragent
+from agents.api_spec_generator import APISpecGeneratorAgent
+async def run_agent_workflow():
+    output_buffer = []
+    openapi_spec_agent = APISpecGeneratorAgent().get_agent()
+    agent_workflow = AgentWorkflow(
+        agents=[Requirement_parser.requirementParse_agent, schemageneratoragent.database_schema_generator_agent, openapi_spec_agent],
+        root_agent="requirementParse_agent",
+        initial_state={"requirements": [], "schema": []},
+    )
+
+    handler = agent_workflow.run(
+        user_msg="Start parsing the FSD and extract all requirements using tools of agents only, once done handoff to database_schema_generator_agent to generate database schema and post that handoff to APISpecGeneratorAgent"
+    )
+
+    current_agent = None
+    async for event in handler.stream_events():
+        if hasattr(event, "current_agent_name") and event.current_agent_name != current_agent:
+            current_agent = event.current_agent_name
+            output_buffer.append(f"\n\n🤖 Agent: {current_agent}\n{'='*50}")
+
+        if isinstance(event, AgentStream) and event.delta:
+            output_buffer.append(event.delta)
+        elif isinstance(event, AgentInput):
+            output_buffer.append(f"\n📥 Input: {event.input}")
+        elif isinstance(event, AgentOutput):
+            if event.response.content:
+                output_buffer.append(f"\n📤 Output: {event.response.content}")
+            if event.tool_calls:
+                tools = ', '.join([call.tool_name for call in event.tool_calls])
+                output_buffer.append(f"\n🛠️ Tools to be used: {tools}")
+        elif isinstance(event, ToolCall):
+            output_buffer.append(f"\n🔨 Calling Tool: {event.tool_name} with {event.tool_kwargs}")
+        elif isinstance(event, ToolCallResult):
+            output_buffer.append(f"\n🔧 Tool Result ({event.tool_name}):\n{event.tool_output}")
+
+    return "\n".join(output_buffer)
+
+if __name__ == "__main__":
+    import asyncio
+    asyncio.run(main())

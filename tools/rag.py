@@ -7,15 +7,16 @@ from llama_index.core.query_engine import BaseQueryEngine
 import json, time, os
 from llama_index.llms.groq import Groq
 from config.settings import settings
+from pathlib import Path
 
 PERSIST_DIR = "./index/"
 DATA_DIR = "./data/fsd/"
 Settings.embed_model = HuggingFaceEmbedding(model_name="BAAI/bge-base-en-v1.5")
-#Settings.llm = Ollama(
-    #model="mistral",
-    #request_timeout=120.0
-#)
-Settings.llm = Groq(model=settings.grok_model_name,api_key=settings.groq_api_key,parallel_tool_calls=True)
+Settings.llm = Ollama(
+    model="mistral",
+    request_timeout=120.0
+)
+#Settings.llm = Groq(model=settings.grok_model_name,api_key=settings.groq_api_key,parallel_tool_calls=True)
 def _get_query_engine() -> BaseQueryEngine:
     """Internal method to return query engine object (not exposed to agent)."""
     if os.path.exists(PERSIST_DIR) and os.listdir(PERSIST_DIR):
@@ -55,7 +56,7 @@ async def get_parsed_requirements(ctx: Context) -> str:
 async def generate_schema_from_parsed_requirements(parasedRequirements: str, ctx: Context) -> str:
     """This function is useful in generating database schema, entity relationships from parased requirements and storing it in memory context"""
     response = await Settings.llm.acomplete(f"generate database schema, entity relationships from functional requirements. This schema will be used in generating fastapi application later :" + parasedRequirements)
-    ctx.store.set("schema",str(response))
+    await ctx.store.set("schema",str(response))
     return str(response)
 
 def write_to_txt_file(file_path: str, content: str) -> str:
@@ -74,3 +75,26 @@ def write_to_txt_file(file_path: str, content: str) -> str:
         return str( json.dumps({"status": "done", "next_agent": "database_schema_generator_agent"}))
     except Exception as e:
         return f"Failed: {str(e)}"
+    
+def write_apispec_to_txt_file(file_path: str, content: str) -> str:
+    """this method is useful in writing the api spec generator agent output into local path
+
+    Args:
+        file_path (str): _description_
+        content (str): _description_
+
+    Returns:
+        str: _description_
+    """
+    try:
+        with open(file_path, 'w', encoding='utf-8') as file:
+            file.write(content)
+        return str( json.dumps({"status": "done", "next_agent": "code_generation_agent"}))
+    except Exception as e:
+        return f"Failed: {str(e)}"
+
+def get_schema(file_name: str) -> str:
+        return Path(f"./data/{file_name}").read_text(encoding="utf-8")
+
+
+

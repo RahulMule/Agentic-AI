@@ -25,5 +25,6 @@ class schemageneratoragent:
         ],
         function_call_mode="sequential",
         llm = llm,
+        can_handoff_to=["APISpecGeneratorAgent"]
 
     )
