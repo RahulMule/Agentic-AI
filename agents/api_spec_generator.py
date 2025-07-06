@@ -17,12 +17,13 @@ class APISpecGeneratorAgent:
             database schema from local path using get_schema function call and 
             pass this to agent/llm to generate openapi specification document in yaml format. 
             once openapi specifications are generated, 
-            store them in local path using write_openapi_to_txt_file at path './data/'""",
+            store them in local path using write_openapi_to_txt_file at path './data/apisepc.yaml'
+            handoff control to CodeGenerationAgent""",
             tools= [
-                    FunctionTool.from_defaults(fn=get_parsed_requirements),
-                    FunctionTool.from_defaults(fn=get_schema),
-                    FunctionTool.from_defaults(fn=write_apispec_to_txt_file),
+                    FunctionTool.from_defaults(fn=get_parsed_requirements,return_direct=True),
+                    FunctionTool.from_defaults(fn=get_schema,return_direct=True),
+                    FunctionTool.from_defaults(fn=write_apispec_to_txt_file,return_direct=True),
                     ],
             function_call_mode="sequential",
-            can_handoff_to=[]
+            can_handoff_to=["CodeGenerationAgent"]
         )

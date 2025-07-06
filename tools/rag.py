@@ -96,5 +96,28 @@ def write_apispec_to_txt_file(file_path: str, content: str) -> str:
 def get_schema(file_name: str) -> str:
         return Path(f"./data/{file_name}").read_text(encoding="utf-8")
 
+def write_code(filename: str, code_content: str) -> str:
+    """
+    Writes the generated code to a file in the ./data/output/ directory.
+
+    Args:
+        filename (str): The name of the file to write (e.g., 'main.py').
+        code_content (str): The code to write to the file.
+
+    Returns:
+        str: Success message or error message.
+    """
+    try:
+        output_dir = './data/output'
+        os.makedirs(output_dir, exist_ok=True)
+        file_path = os.path.join(output_dir, filename)
+
+        with open(file_path, 'w', encoding='utf-8') as file:
+            file.write(code_content)
+
+        return f"✅ Code successfully written to: {file_path}"
+    except Exception as e:
+        return f"❌ Failed to write code: {str(e)}"
+
 
 

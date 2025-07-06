@@ -19,9 +19,9 @@ class schemageneratoragent:
         description="This agent is useful to generate database schema and entity relationships from function requirements",
         system_prompt= system_prompt,
         tools=[
-            FunctionTool.from_defaults(fn=get_parsed_requirements),
-            FunctionTool.from_defaults(fn=generate_schema_from_parsed_requirements),
-            FunctionTool.from_defaults(fn=query_rag)      
+            FunctionTool.from_defaults(fn=get_parsed_requirements,return_direct=True),
+            FunctionTool.from_defaults(fn=generate_schema_from_parsed_requirements,return_direct=True),
+            FunctionTool.from_defaults(fn=query_rag,return_direct=True)      
         ],
         function_call_mode="sequential",
         llm = llm,
