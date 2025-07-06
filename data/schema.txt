@@ -1,0 +1,59 @@
+Based on the provided functional and non-functional requirements, here's a high-level database schema for the FastAPI application:
+
+1. **Users**
+   - id (UUID, primary key)
+   - username (VARCHAR(20), unique, not null)
+   - email (VARCHAR, unique, not null)
+   - password_hash (VARCHAR, not null)
+   - bio (VARCHAR, optional)
+   - created_at (DATETIME, default current_timestamp)
+   - role (ENUM('Public Visitor', 'Registered User', 'Admin'), default 'Public Visitor')
+
+2. **Posts**
+   - id (UUID, primary key)
+   - title (VARCHAR(200), not null)
+   - body (TEXT, not null)
+   - author_id (UUID, foreign key references Users)
+   - created_at (DATETIME, default current_timestamp)
+   - updated_at (DATETIME, on update current_timestamp)
+
+3. **Comments**
+   - id (UUID, primary key)
+   - post_id (UUID, foreign key references Posts)
+   - author_id (UUID, foreign key references Users)
+   - body (TEXT, not null)
+   - created_at (DATETIME, default current_timestamp)
+
+4. **Tags**
+   - id (UUID, primary key)
+   - name (VARCHAR, unique, not null)
+
+5. **Post_Tag** (Junction table to represent the many-to-many relationship between Posts and Tags)
+   - post_id (UUID, foreign key references Posts)
+   - tag_id (UUID, foreign key references Tags)
+
+Relationships:
+- One User can have one or more Posts and Comments.
+- One Post can have one Author and multiple Comments.
+- One Post can be associated with zero or more Tags.
+- A Tag can be associated with zero or many Posts.
+
+REST endpoints:
+- Authentication (/auth): POST /auth/register, POST /auth/login
+- Users (/users): GET /users/{id}, PUT /users/{id}, DELETE /users/{id}
+- Posts (/posts): GET /posts, POST /posts, GET /posts/{id}, PUT /posts/{id}, DELETE /posts/{id}
+- Comments (/comments): POST /posts/{id}/comments, GET /posts/{id}/comments, DELETE /comments/{id}
+- Tags (/tags): GET /tags, GET /tags/{tag}/posts
+
+Validations and constraints:
+- Username: 3-20 alphanumeric characters
+- Password: minimum 8 characters, at least one number and one letter
+- Email: valid format and unique
+- Title (for posts): non-empty, max 200 characters
+- Comment body: non-empty, max 1000 characters
+
+Non-functional requirements:
+- Performance: Optimize for 95% of requests to be handled within 200 milliseconds under 1000 concurrent users.
+- Availability: Maintain a minimum uptime of 99.9%.
+- Security: Use HTTPS, and bcrypt for password hashing.
+- Logging: Log every request with timestamp, user ID, endpoint, and status.
