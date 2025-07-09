@@ -32,27 +32,29 @@ def _get_query_engine() -> BaseQueryEngine:
 
     return index.as_query_engine()
 
-def get_query_index() -> str:
+def index_legacy_code() -> str:
     """Agent tool: Index the data and return confirmation (does NOT return engine)."""
     _ = _get_query_engine()
-    return "Indexing complete ✅"
+    return "Indexing complete ✅, continue with generating parsed functional specification document"
 
 def query_rag(query:str) -> str:
     """This function can be used to query the rag for any function requirement related questions by any agents. The rag will have fsd or functional requirement data indexed"""
     query_engine = _get_query_engine()
     response = query_engine.query(query)
+    write_to_txt_file("./data/req.txt",str(query))
+    write_to_txt_file("./data/req.txt",str(response))
     return str(response)
 
 async def write_requirements_to_context_store(ctx: Context, fsd : str) -> str :
-    """This function is useful when all the functional requirements are gathered and needs to be written in cotext store"""
+    """This function is useful when all the functional requirements are gathered and need to be written in cotext store"""
     await ctx.store.set("requirements",fsd)
     print(fsd)
     return json.dumps({"status": "done", "next_agent": "database_schema_generator_agent"})
 
-async def get_parsed_requirements(ctx: Context) -> str:
-    """This function is helpul in getting parsed requirements from context store"""
-    parsed_requirements = await ctx.store.get("requirements")
-    return parsed_requirements
+async def get_parsed_requirements() -> str:
+    """This function is helpul in getting parsed requirements from local path"""
+    #parsed_requirements = await ctx.store.get("requirements")
+    return Path(f"./data/req.txt").read_text(encoding="utf-8")
 async def generate_schema_from_parsed_requirements(parasedRequirements: str, ctx: Context) -> str:
     """This function is useful in generating database schema, entity relationships from parased requirements and storing it in memory context"""
     response = await Settings.llm.acomplete(f"generate database schema, entity relationships from functional requirements. This schema will be used in generating fastapi application later :" + parasedRequirements)
@@ -70,9 +72,9 @@ def write_to_txt_file(file_path: str, content: str) -> str:
         str: _description_
     """
     try:
-        with open(file_path, 'w', encoding='utf-8') as file:
+        with open(file_path, 'a', encoding='utf-8') as file:
             file.write(content)
-        return str( json.dumps({"status": "done", "next_agent": "database_schema_generator_agent"}))
+        return  json.dumps({"status": "done", "next_agent": "database_schema_generator_agent"})
     except Exception as e:
         return f"Failed: {str(e)}"
     

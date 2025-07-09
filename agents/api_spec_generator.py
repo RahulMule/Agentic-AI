@@ -5,8 +5,8 @@ from tools.rag import get_parsed_requirements,get_schema,write_apispec_to_txt_fi
 from config.settings import settings
 class APISpecGeneratorAgent:
     def __init__(self):
-        self.llm =  Groq(model = settings.grok_model_name,api_key=settings.groq_api_key)
-    
+        #self.llm =  Groq(model = settings.grok_model_name,api_key=settings.groq_api_key)
+        self.llm  = Groq(model= "mistral-saba-24b",api_key= settings.groq_api_key)
     def get_agent(self):
         return FunctionAgent(
             name="APISpecGeneratorAgent",

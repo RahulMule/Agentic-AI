@@ -1,0 +1,73 @@
+What are the system-level requirements? The provided context does not mention any system-level requirements explicitly. However, some inferred requirements can be identified from the information provided:
+
+1. Performance Requirements: The application should respond to 95% of requests within 200 milliseconds when under 1000 concurrent users.
+
+2. Availability Requirements: The application should have a minimum uptime of 99.9%.
+
+3. Security Requirements: The application should use HTTPS, and passwords should be hashed using bcrypt.
+
+4. Logging Requirements: Every request to the system should be logged with a timestamp, user ID (if available), endpoint, and status.What are the functional requirements? Users can register, login, and manage own profiles.
+
+Logged-in users can create, read, update, and delete their own posts.
+
+Anyone can list and read posts; only logged-in users can comment.
+
+Each post page displays all comments.
+
+Tagging system supports filtering posts by tag.
+
+Admins can delete any post or comment, or ban users.What entities are described in the system? In the provided context, there are several entities described: Users, Posts, Comments, Tags, and Authentication (tokens). Each entity has its specific attributes and behaviors within the Blogging Platform REST API.What are the data models? The provided data models are as follows:
+
+1. User:
+   - id: uuid
+   - username: str (min 3, max 20)
+   - email: str (valid email)
+   - password_hash: str
+   - bio: Optional[str]
+   - created_at: datetime
+
+2. Post:
+   - id: uuid
+   - title: str (max 200)
+   - body: str
+   - author_id: uuid
+   - tags: List[str]
+   - created_at: datetime
+   - updated_at: datetime
+
+3. Comment:
+   - id: uuid
+   - post_id: uuid
+   - author_id: uuid
+   - body: str (max 1000)
+   - created_at: datetimeWhat are the roles and permissions? The provided context details four actors in the FSD Blogging Platform REST API: Public Visitor, Registered User, Admin, and Users (presumably with elevated privileges).
+
+Registered Users can perform actions like registering, logging in, managing their own profiles, creating, reading, updating, and deleting their own posts.
+
+Users can also list and read posts, but only logged-in users can comment. Each post page displays all comments.
+
+Admins have full privileges, which means they can delete any post or comment, or ban users.What REST endpoints are proposed? The REST endpoints proposed in the provided context include:
+
+1. Authentication: POST /auth/register and POST /auth/login
+2. Users: GET /users/{id}, PUT /users/{id}, DELETE /users/{id}
+3. Posts: POST /posts/, GET /posts/, GET /posts/{id}, PUT /posts/{id}, DELETE /posts/{id}
+4. Comments: POST /posts/{id}/comments, GET /posts/{id}/comments, DELETE /comments/{id}
+5. Tags: GET /tags/, GET /tags/{tag}/posts
+
+These endpoints are used for various purposes such as user registration, login, profile management, creating, reading, updating, and deleting posts and comments, listing all posts, specific post details including comments, filtering posts by tag, and more.What validations and constraints exist? In the provided context, there are several validations and constraints defined for different data fields in the application:
+
+1. Username: Minimum 3 and maximum 20 alphanumeric characters.
+2. Password: Minimum 8 characters, at least one number, and one letter.
+3. Email: Valid email format and unique.
+4. Title (for posts): Non-empty, max 200 characters.
+5. Comment body: Non-empty, max 1000 characters.
+
+Additionally, there are some functional requirements that can also be considered constraints:
+
+1. Each post page displays all comments.
+2. The tagging system supports filtering posts by tag.
+3. Admins can delete any post or comment, or ban users.What non-functional requirements are specified? The specified non-functional requirements are Performance, Availability, and Security.
+
+1. Performance: Requires that 95% of requests be handled in less than 200 milliseconds under 1000 concurrent users.
+2. Availability: Requires a minimum uptime of 99.9%.
+3. Security: Requires the use of HTTPS and password hashing with bcrypt.

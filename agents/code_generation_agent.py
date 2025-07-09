@@ -5,7 +5,8 @@ from llama_index.core.tools import FunctionTool
 from llama_index.core.agent.workflow import FunctionAgent
 class CodeGenerationAgent:
     def __init__(self):
-        self.llm = Groq(model= settings.grok_model_name, api_key= settings.groq_api_key)
+        #self.llm = Groq(model= settings.grok_model_name, api_key= settings.groq_api_key)
+        self.llm  = Groq(model= "mistral-saba-24b",api_key= settings.groq_api_key)
     def get_agent(self):
         return FunctionAgent(
             name="CodeGenerationAgent",

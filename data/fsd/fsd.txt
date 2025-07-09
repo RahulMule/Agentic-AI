@@ -138,4 +138,3 @@ Availability: ≥ 99.9% uptime
 Security: HTTPS required; password hashing (bcrypt)
 
 Logging: Log every request with timestamp, user ID, endpoint, and status
-

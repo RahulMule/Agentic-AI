@@ -12,16 +12,17 @@ class schemageneratoragent:
     
     system_prompt = load_prompt("database_schema_generator.txt")
 
-    #llm = Ollama(model="codellama:7b-python",request_timeout=120.0)
-    llm = Groq(model=settings.grok_model_name,api_key=settings.groq_api_key,parallel_tool_calls=True)
+    #llm = Ollama(model="mistral",request_timeout=120.0)
+    #llm = Groq(model=settings.grok_model_name,api_key=settings.groq_api_key,parallel_tool_calls=True)
+    llm = Groq(model= "mistral-saba-24b",api_key= settings.groq_api_key)
     database_schema_generator_agent = FunctionAgent(
         name="database_schema_generator_agent",
         description="This agent is useful to generate database schema and entity relationships from function requirements",
         system_prompt= system_prompt,
         tools=[
-            FunctionTool.from_defaults(fn=get_parsed_requirements,return_direct=True),
-            FunctionTool.from_defaults(fn=generate_schema_from_parsed_requirements,return_direct=True),
-            FunctionTool.from_defaults(fn=query_rag,return_direct=True)      
+            FunctionTool.from_defaults(fn=get_parsed_requirements),
+            FunctionTool.from_defaults(fn=generate_schema_from_parsed_requirements),
+            FunctionTool.from_defaults(fn=query_rag)   
         ],
         function_call_mode="sequential",
         llm = llm,

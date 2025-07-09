@@ -10,7 +10,7 @@ async def main():
     code_generation_agent = CodeGenerationAgent().get_agent()
     agent_workflow = AgentWorkflow(
         agents=[Requirement_parser.requirementParse_agent, schemageneratoragent.database_schema_generator_agent,openapi_spec_agent,code_generation_agent],
-        root_agent= "requirementParse_agent",
+        root_agent= "database_schema_generator_agent",
         initial_state={
             "requirements":[],
             "schema":[]
@@ -18,8 +18,7 @@ async def main():
     )
 
     handler =  agent_workflow.run(
-    user_msg = ("Start parsing the FSD and extract all requirements using tools of agents only, once done handoff to database_schema_generator_agent to generate database schema and post that handoff to APISpecGeneratorAgent to generate openapi spec and at last generate code using APISpecGeneratorAgent ")
-
+ "Index the legacy code, generate parsed specification document, generate database schema,generate open api specificiation document, generate fastapi based rest api using parsed functional requirement document"
     )
 
 
