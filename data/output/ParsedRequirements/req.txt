@@ -1,0 +1,87 @@
+What are the system-level requirements? The system-level requirements for the FSD Blogging Platform REST API include:
+1. Performance: Achieve 95% of requests under 200 milliseconds for up to 1000 concurrent users.
+2. Availability: Maintain an uptime of at least 99.9%.
+3. Security: Implement HTTPS for secure connections and use bcrypt for password hashing.
+4. Logging: Record every request with a timestamp, user ID (if applicable), endpoint, and status.What are the functional requirements? Users can register, login, and manage own profiles.
+
+Logged-in users can create, read, update, and delete their own posts.
+
+Anyone can list and read posts; only logged-in users can comment.
+
+Each post page displays all comments.
+
+Tagging system supports filtering posts by tag.
+
+Admins can delete any post or comment, or ban users.What entities are described in the system? In the provided context, the following entities are described:
+
+1. Public Visitor
+2. Registered User
+3. Admin
+4. User (data model)
+5. Post (data model)
+6. Comment (data model)
+7. Tag (not explicitly shown as a data model but mentioned in functionality and filtering)What are the data models? The provided context includes the following data models:
+
+1. User:
+   - id (uuid)
+   - username (str with 3-20 alphanumeric characters)
+   - email (valid email format and unique)
+   - password_hash (str)
+   - bio (Optional[str])
+   - created_at (datetime)
+
+2. Post:
+   - id (uuid)
+   - title (str with max 200 characters)
+   - body (str)
+   - author_id (uuid)
+   - tags (List[str])
+   - created_at (datetime)
+   - updated_at (datetime)
+
+3. Comment:
+   - id (uuid)
+   - post_id (uuid)
+   - author_id (uuid)
+   - body (str with max 1000 characters)
+   - created_at (datetime)What are the roles and permissions? In the provided context, there are three defined roles in this blogging platform REST API - Public Visitor, Registered User, and Admin. Each role has different permissions as follows:
+
+1. Public Visitor: This role does not require any authentication and can only list and read posts. They cannot comment or manage their own data.
+
+2. Registered User: After registration and login, this role gains the ability to create, read, update, and delete their own posts. They are also allowed to comment on posts. However, they do not have the power to delete any post or comment created by others.
+
+3. Admin: This role has full privileges. Admins can delete any post or comment, ban users, and view all data without restrictions.What REST endpoints are proposed? The following REST endpoints are proposed in the provided context:
+
+1. Authentication (2.1) with the following endpoints:
+   - POST /auth/register
+   - POST /auth/login
+
+2. Users (2.2) with the following endpoints:
+   - GET /users/{id}
+   - PUT /users/{id}
+   - DELETE /users/{id}
+
+3. Posts (2.3) with the following endpoints:
+   - POST /posts/
+   - GET /posts/
+   - GET /posts/{id}
+   - PUT /posts/{id}
+   - DELETE /posts/{id}
+
+4. Comments (2.4) with the following endpoints:
+   - POST /posts/{id}/comments
+   - GET /posts/{id}/comments
+   - DELETE /comments/{id}
+
+5. Tags (2.5) with the following endpoints:
+   - GET /tags/
+   - GET /tags/{tag}/postsWhat validations and constraints exist? In the provided context, the following validations and constraints exist:
+1. Username: 3-20 alphanumeric characters.
+2. Password: minimum 8 characters, at least one number and one letter.
+3. Email: Valid format and unique.
+4. Title: non-empty, max 200 characters.
+5. Comment body: non-empty, max 1000 characters.What non-functional requirements are specified? The specified non-functional requirements in this context include:
+1. Performance: 95% of requests should be handled within 200 ms under 1000 concurrent users.
+2. Availability: The system should have a minimum uptime of 99.9%.
+3. Security: HTTPS is required, and password hashing using bcrypt will be implemented.
+4. Logging: Every request to the system should be logged with timestamp, user ID, endpoint, and status.

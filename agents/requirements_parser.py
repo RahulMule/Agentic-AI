@@ -1,6 +1,6 @@
 from llama_index.core.agent.workflow import FunctionAgent
 from llama_index.llms.ollama import Ollama
-from tools.rag import query_rag,index_legacy_code,write_requirements_to_context_store, write_to_txt_file
+from tools.rag import query_rag,index_legacy_code,Update_workflow_context, write_to_txt_file
 from llama_index.core.tools import FunctionTool
 from llama_index.llms.groq import Groq
 from agents.database_schema_generator_agent import schemageneratoragent
@@ -28,7 +28,6 @@ class Requirement_parser:
         tools=[
             FunctionTool.from_defaults(fn=index_legacy_code),
             FunctionTool.from_defaults(fn=query_rag),
-            FunctionTool.from_defaults(fn=write_to_txt_file),
         ],
         function_call_mode="sequential",
         can_handoff_to=["database_schema_generator_agent"]

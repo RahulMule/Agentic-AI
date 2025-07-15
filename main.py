@@ -10,15 +10,16 @@ async def main():
     code_generation_agent = CodeGenerationAgent().get_agent()
     agent_workflow = AgentWorkflow(
         agents=[Requirement_parser.requirementParse_agent, schemageneratoragent.database_schema_generator_agent,openapi_spec_agent,code_generation_agent],
-        root_agent= "database_schema_generator_agent",
+        root_agent= "requirementParse_agent",
         initial_state={
-            "requirements":[],
-            "schema":[]
+            "requirementParse_agent":"requirementParse_agent is not completed yet",
+            "database_schema_generator_agent":"database_schema_generator_agent is not completed yet",
+            "APISpecGeneratorAgent":"APISpecGeneratorAgent is not completed yet"
         }
     )
 
     handler =  agent_workflow.run(
- "Index the legacy code, generate parsed specification document, generate database schema,generate open api specificiation document, generate fastapi based rest api using parsed functional requirement document"
+ """Please index the legacy code, parse all functional requirements, generate a database schema, OpenAPI specifications,rest api(FastAPI code) for the backend."""
     )
 
 

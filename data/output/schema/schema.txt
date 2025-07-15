@@ -1,0 +1,109 @@
+ Based on the given functional requirements, here's a proposed database schema for the FSD Blogging Platform REST API using FastAPI:
+
+1. Users Table (`users`)
+   - id (UUID, primary key)
+   - username (VARCHAR(20), unique, not null)
+   - email (VARCHAR(255), unique, not null)
+   - password_hash (VARCHAR)
+   - bio (TEXT)
+   - created_at (DATETIME)
+
+2. Posts Table (`posts`)
+   - id (UUID, primary key)
+   - title (VARCHAR(200), not null)
+   - body (TEXT)
+   - author_id (UUID, references `users`.`id`, not null)
+   - created_at (DATETIME)
+   - updated_at (DATETIME)
+
+3. Comments Table (`comments`)
+   - id (UUID, primary key)
+   - post_id (UUID, references `posts`.`id`, not null)
+   - author_id (UUID, references `users`.`id`, not null)
+   - body (VARCHAR(1000), not null)
+   - created_at (DATETIME)
+
+4. Tags Table (not shown in the context, but can be modeled as a separate table with `id` and `name` columns, where `name` is unique)
+
+The relationships between the tables are as follows:
+- A user has many posts and comments.
+- A post belongs to one user, has many comments, and is related to multiple tags (through a pivot table).
+- A comment belongs to one user and one post.
+
+As for roles and permissions, you can implement them in FastAPI by using OAuth2PasswordBearer or another authentication library like JWT. To enforce permissions, create middleware functions that verify the role of the authenticated user before performing certain actions.
+
+Regarding REST endpoints, here's a list based on the given functional requirements:
+- Authentication (/auth): POST /auth/register, POST /auth/login
+- Users (/users/{id} or /me for logged-in users): GET, PUT, DELETE
+- Posts (/posts or /my-posts for logged-in users): GET, POST, GET/{id}, PUT/{id}, DELETE/{id}
+- Comments (/comments or /{post_id}/comments for logged-in users): POST, GET, DELETE
+- Tags (/tags or /tag/{tag}/posts): GET, GET/{tag}
+
+The validations and constraints are mentioned in the question itself. Ensure you implement these during data validation using FastAPI's Pydantic models.
+
+Finally, for the non-functional requirements:
+- Performance: Implement caching strategies, use efficient database queries, optimize response sizes, and consider asynchronous processing.
+- Availability: Utilize a load balancer, set up redundancy with multiple instances, and monitor system health.
+- Security: Use HTTPS, implement rate limiting, sanitize input, and avoid SQL injection attacks by using prepared statements or parameterized queries.
+- Logging: Use logging libraries like WSGILogger for Flask or LoggerAdapter in FastAPI to capture the necessary metadata for each request. Here's a simplified ER diagram for the FSD Blogging Platform REST API based on the provided functional requirements:
+
+```mermaid
+erDiagram
+  User ||--|* Post : has_many
+  Comment ||--|* Post : has_many
+  Admin ||--|{ User : is_a kind_of }
+  PublicVisitor ||--|{ User : is_a kind_of }
+  User {
+      id uuid
+      username str(3 to 20) not null
+      email str email not null unique
+      password_hash str
+      bio str
+      created_at timestamp
+  }
+  Post {
+      id uuid
+      title str(1 to 200) not null
+      body text
+      author_id uuid
+      tags list
+      created_at timestamp
+      updated_at timestamp
+  }
+  Comment {
+      id uuid
+      post_id uuid
+      author_id uuid
+      body text
+      created_at timestamp
+  }
+  Admin ||--|| User : has_one
+  PublicVisitor ||--|| User : has_one
+```
+
+REST endpoints:
+
+1. Authentication (2.1) with the following endpoints:
+   - POST /auth/register
+   - POST /auth/login
+
+2. Users (2.2) with the following endpoints:
+   - GET /users/{id}
+   - PUT /users/{id}
+   - DELETE /users/{id} (only for Admins or owners of User records)
+
+3. Posts (2.3) with the following endpoints:
+   - POST /posts/ (for Registered Users and Admins)
+   - GET /posts/
+   - GET /posts/{id}
+   - PUT /posts/{id} (for Registered Users and Admins)
+   - DELETE /posts/{id} (only for Admins)
+
+4. Comments (2.4) with the following endpoints:
+   - POST /posts/{id}/comments (for Registered Users)
+   - GET /posts/{id}/comments
+   - DELETE /comments/{id} (only for owners of Comment records or Admins)
+
+5. Tags (2.5) with the following endpoints:
+   - GET /tags/
+   - GET /tags/{tag}/posts

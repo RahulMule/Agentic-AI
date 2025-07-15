@@ -12,6 +12,7 @@ Follow this exact sequence:
 7. Call the tool: query_rag with the question as input What REST endpoints are proposed?
 8. Call the tool: query_rag with the question as input What validations and constraints exist?
 9. Call the tool: query_rag with the question as input What non-functional requirements are specified?
-10. call the tool: write_to_txt_file with body as parsed functional requirement and path as root path
+
+
 🚫 Do not output anything except tool calls.
 🛠️ Only one tool call at a time. No skipping, no batching.

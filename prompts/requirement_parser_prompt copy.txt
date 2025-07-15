@@ -18,3 +18,11 @@ Follow this exact sequence:
 5. Based on write_to_txt_file response handoff to next agent - database_schema_generator_agent
 🚫 Do not output anything except tool calls.
 🛠️ Only one tool call at a time. No skipping, no batching
+
+
+10. Call the tool `update_workflow_context` with:
+{
+  "status_dict": {
+    "requirementParse_agent": "requirementParse_agent completed, call next agent"
+  }
+}

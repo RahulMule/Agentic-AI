@@ -1,0 +1,284 @@
+ Here is the OpenAPI Specification document generated from the parsed specification document:
+
+```yaml
+openapi: 3.0.0
+info:
+  title: FSD Blogging Platform REST API
+  description: A REST API for a blogging platform.
+  version: 1.0.0
+servers:
+  - url: http://localhost:8000
+paths:
+  /auth:
+    post:
+      summary: Register a new user
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserRegistration'
+      responses:
+        '201':
+          description: Created
+      security: []
+    post:
+      summary: Login a user
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserLogin'
+      responses:
+        '200':
+          description: OK
+      security: []
+  /users/{id}:
+    get:
+      summary: Get user details
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+        '404':
+          description: Not Found
+    put:
+      summary: Update user details
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserUpdate'
+      responses:
+        '200':
+          description: OK
+    delete:
+      summary: Delete user account (only for Admins or owners of User records)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: No Content
+        '403':
+          description: Forbidden
+  /posts:
+    get:
+      summary: List posts
+      responses:
+        '200':
+          description: OK
+    post:
+      summary: Create a new post (for Registered Users and Admins)
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PostCreate'
+      responses:
+        '201':
+          description: Created
+      security: []
+  /posts/{id}:
+    get:
+      summary: Get post details
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+        '404':
+          description: Not Found
+    put:
+      summary: Update post details (for Registered Users and Admins)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PostUpdate'
+      responses:
+        '200':
+          description: OK
+    delete:
+      summary: Delete post (only for Admins)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: No Content
+        '403':
+          description: Forbidden
+  /posts/{id}/comments:
+    post:
+      summary: Add a new comment (for Registered Users)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CommentCreate'
+      responses:
+        '201':
+          description: Created
+    get:
+      summary: List comments for a post
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+  /comments/{id}:
+    delete:
+      summary: Delete comment (only for owners of Comment records or Admins)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: No Content
+        '403':
+          description: Forbidden
+  /tags:
+    get:
+      summary: List tags
+      responses:
+        '200':
+          description: OK
+  /tags/{tag}/posts:
+    get:
+      summary: List posts with a specific tag
+      parameters:
+        - name: tag
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+components:
+  schemas:
+    UserRegistration:
+      type: object
+      properties:
+        username:
+          type: string
+          format: alphaNum
+          maxLength: 20
+        email:
+          type: string
+          format: email
+          minLength: 5
+        password:
+          type: string
+          format: password
+          minimumItems: 8
+          containsOnly: [alphanumeric]
+          pattern: "^(?=.*[a-z])(?=.*[A-Z]).{8,}$"
+    UserLogin:
+      type: object
+      properties:
+        username:
+          type: string
+          format: alphaNum
+          maxLength: 20
+        password:
+          type: string
+          format: password
+          minimumItems: 8
+          containsOnly: [alphanumeric]
+    UserUpdate:
+      type: object
+      properties:
+        bio:
+          type: string
+    PostCreate:
+      $ref: '#/components/schemas/Post'
+    Post:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        title:
+          type: string
+          maxLength: 200
+        body:
+          type: string
+        author_id:
+          type: string
+          format: uuid
+        tags:
+          type: array
+          items:
+            type: string
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+    CommentCreate:
+      $ref: '#/components/schemas/Comment'
+    Comment:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        post_id:
+          type: string
+          format: uuid
+        author_id:
+          type: string
+          format: uuid
+        body:
+          type: string
+          maxLength: 1000
+        created_at:
+          type: string
+          format: date-time
+securitySchemes:
+  OAuth2PasswordBearer:
+    type: openidconnect
+    flow: password
+```
